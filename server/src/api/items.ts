@@ -50,7 +50,7 @@ export const itemsApi = {
 			return;
 		}
 
-		logger.info( 'add item with %o', req.body );
+		// logger.info( 'add item with %o', req.body );
 		const itemText = req.body.text;
 		const ownerId = req.body.ownerId;
 		const visible_to_owner = ownerId === userId ? true : req.body.visible_to_owner;

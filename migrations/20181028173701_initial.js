@@ -10,8 +10,8 @@ exports.up = ( knex, Promise ) => {
 		knex.schema.createTable( 'items', ( table ) => {
 			table.increments( 'id' );
 			table.text( 'text' );
-			table.integer( 'owner_id' ).references( 'users.id' ).onDelete( 'CASCADE' );
-			table.integer( 'creator_id' ).references( 'users.id' ).onDelete( 'CASCADE' );
+			table.integer( 'owner_id' ).unsigned().notNullable().references( 'users.id' ).onDelete( 'CASCADE' );
+			table.integer( 'creator_id' ).unsigned().notNullable().references( 'users.id' ).onDelete( 'CASCADE' );
 			table.string( 'year' );
 			table.boolean( 'visible_to_owner' );
 			table.boolean( 'claimed' ).defaultTo( false );
@@ -19,13 +19,13 @@ exports.up = ( knex, Promise ) => {
 		knex.schema.createTable( 'links', ( table ) => {
 			table.increments( 'id' );
 			table.text( 'url' );
-			table.integer( 'item_id' ).references( 'items.id' ).onDelete( 'CASCADE' );
+			table.integer( 'item_id' ).unsigned().notNullable().references( 'items.id' ).onDelete( 'CASCADE' );
 		} ),
 		knex.schema.createTable( 'comments', ( table ) => {
 			table.increments( 'id' );
 			table.text( 'text' );
-			table.integer( 'item_id' ).references( 'items.id' ).onDelete( 'CASCADE' );
-			table.integer( 'creator_id' ).references( 'users.id' ).onDelete( 'CASCADE' );
+			table.integer( 'item_id' ).unsigned().notNullable().references( 'items.id' ).onDelete( 'CASCADE' );
+			table.integer( 'creator_id' ).unsigned().notNullable().references( 'users.id' ).onDelete( 'CASCADE' );
 			table.timestamp( 'created_at' ).defaultTo( knex.fn.now() );
 		} ),
 	] );

@@ -13,6 +13,7 @@ interface Config {
 		signed: boolean;
 	};
 	cookieSecret: string;
+	sendRawDates: boolean;
 }
 
 let configFile = join( __dirname, '../../config.json' );

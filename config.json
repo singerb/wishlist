@@ -7,5 +7,6 @@
 		"secure":   false,
 		"signed":   true
 	},
-	"cookieSecret": "lk43t34tsgr9s0rg"
+	"cookieSecret": "lk43t34tsgr9s0rg",
+	"sendRawDates": false
 }

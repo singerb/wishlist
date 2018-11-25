@@ -3,6 +3,8 @@ import { Model, RelationMappings } from 'objection';
 import { User, UserApiObject } from './user';
 import { ToApiObject } from './to-api';
 
+import config from '../config';
+
 export interface CommentApiObject {
 	readonly id?: number;
 	text?: string;
@@ -67,6 +69,10 @@ function toDate( obj: any, fieldName: string ): any {
 }
 
 function toTime( obj: any, fieldName: string ): any {
+	if ( config.sendRawDates ) {
+		return obj;
+	}
+
 	if ( obj != null && obj[ fieldName ] != null && obj[ fieldName ].getTime ) {
 		obj[ fieldName ] = obj[ fieldName ].getTime();
 	}
