@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "outDir":             "./dist",
+        "allowJs":            true,
+        "target":             "es2018",
+        "strict":             true,
+        "module":             "commonjs",
+        "moduleResolution":   "node",
+        "lib":                [ "dom", "es2018" ],
+        "noUnusedLocals":     true,
+        "noUnusedParameters": true,
+    },
+    "include":         [
+        "./src/**/*"
+    ]
+}

@@ -1,0 +1,11 @@
+{
+	"tokenSecret":   "w3ltgsjvdnl#QL#K",
+	"cookieName":    "wl-user-token",
+	"cookieOptions": {
+		"domain":   "localhost",
+		"httpOnly": true,
+		"secure":   false,
+		"signed":   true
+	},
+	"cookieSecret": "lk43t34tsgr9s0rg"
+}

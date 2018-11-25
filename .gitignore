@@ -1,0 +1,5 @@
+node_modules/*
+.vscode/*
+server/dist/*
+client/dist/*
+production/*
