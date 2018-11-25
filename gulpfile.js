@@ -50,13 +50,13 @@ gulp.task( 'build-client', [ 'copy-html' ], () => {
 		} )
 		.plugin( 'vueify/plugins/extract-css', { out: 'client/dist/css/components.css' } )
 		.plugin( tsify, { project: 'client/' } )
+		.transform( envify )
 		.on( 'error', console.log )
 		.bundle()
 		.on( 'error', console.log )
 		.pipe( source( 'main.js' ) )
 		.pipe( buffer() )
 		.pipe( sourcemaps.init( { loadMaps: true } ) )
-		// .pipe( envify() )
 		.pipe( uglify( {
 			keep_fnames: true,
 		} ) )

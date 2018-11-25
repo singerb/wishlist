@@ -1,10 +1,10 @@
-import { env } from 'process';
+import 'process';
 
 export enum Env { DEVELOPMENT, PRODUCTION }
 
 export default function getEnv() {
-	if ( env.NODE_ENV ) {
-		switch ( env.NODE_ENV ) {
+	if ( process.env.NODE_ENV ) {
+		switch ( process.env.NODE_ENV ) {
 			case 'production':
 				return Env.PRODUCTION;
 				break;
