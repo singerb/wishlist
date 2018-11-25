@@ -56,6 +56,12 @@ export const itemsApi = {
 		const visible_to_owner = ownerId === userId ? true : req.body.visible_to_owner;
 		const links = req.body.links;
 
+		if ( ! itemText || itemText === '' ) {
+			res.status( 400 ).send( { ok: false, error: 'Item text cannot be empty' } );
+
+			return;
+		}
+
 		await Item.query().insertGraph(
 			{
 				text: itemText,

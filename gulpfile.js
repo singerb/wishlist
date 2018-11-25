@@ -50,7 +50,7 @@ gulp.task( 'build-client', [ 'copy-html' ], () => {
 		} )
 		.plugin( 'vueify/plugins/extract-css', { out: 'client/dist/css/components.css' } )
 		.plugin( tsify, { project: 'client/' } )
-		.transform( envify )
+		.transform( { global: true }, envify )
 		.on( 'error', console.log )
 		.bundle()
 		.on( 'error', console.log )

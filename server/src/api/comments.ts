@@ -25,6 +25,12 @@ export const commentsApi = {
 		const itemId = req.body.itemId;
 		const claimed = req.body.claimed;
 
+		if ( ! commentText || commentText === '' ) {
+			res.status( 400 ).send( { ok: false, error: 'Comment text cannot be empty' } );
+
+			return;
+		}
+
 		await Comment.query().insert( { text: commentText, item_id: itemId, creator_id: userId, created_at: new Date() } );
 		if ( claimed ) {
 			await Item.query().patch( { claimed: true } ).where( 'id', '=', itemId );
