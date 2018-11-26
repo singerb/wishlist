@@ -1,6 +1,15 @@
 <template>
 	<div>
-		<p>Instructions about items and comments go here.</p>
+		<p>Welcome to the holiday wishlist, newly updated for 2018. Here's a brief reivew and explanation of some new things:</p>
+		<ul>
+			<li>You can see items on other people's lists, and items on your own list that you've added or that were marked as visible to you. Note that this means Ben and Anne can see Wren's items, for now.</li>
+			<li>You can see comments on other people's items (so Ben and Anne can see comments on Wren's items, for now).</li>
+			<li>You can add items to your own list.</li>
+			<li>You can add items to other people's lists, choosing whether to make them visible to that person.</li>
+			<li>When adding items, you can add optional links to that item; new this year, you can add multiple links to one item. Use multiple links if you're giving people a choice, or showing some examples for a single item; keep multiple items separate.</li>
+			<li>You can comment on other people's items; new this year, if you're commenting to say you bought or will buy something, you can choose to claim the item when you comment, which will flag it to remind other people not to get that.</li>
+			<li>Finally, new this year you can change your password and your name in the profile screen.</li>
+		</ul>
 		<div v-for='user in users' :key='user.id'>
 			<wl-user-items :user='user'></wl-user-items>
 		</div>
