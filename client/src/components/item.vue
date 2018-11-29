@@ -3,8 +3,8 @@
 		<div class='row'>
 			<div class='eight columns'>
 				<span v-if='item.owner.id !== currentUser.id && ( item.claimed || ( item.visible_to_owner && item.owner.id !== item.creator.id ) )'>
-					<small class='pill yellow' v-if='item.claimed'>Claimed</small>
-					<small class='pill blue' v-if='item.visible_to_owner && item.owner.id !== item.creator.id'>Visible to {{ item.owner.name }}</small>
+					<small v-if='item.claimed'><wl-pill :color='"lightyellow"'>Claimed</wl-pill></small>
+					<small v-if='item.visible_to_owner && item.owner.id !== item.creator.id'><wl-pill :color='"lightblue"'>Visible to {{ item.owner.name }}</wl-pill></small>
 					<br />
 				</span>
 				{{ item.text }}
@@ -75,20 +75,6 @@
 	margin-bottom: 0.5em;
 }
 
-.yellow {
-	background-color: lightyellow;
-}
-
-.blue {
-	background-color: lightblue;
-}
-
-.pill {
-	border-radius: 0.25em;
-	padding: 0.25em;
-	margin: 0.25em;
-}
-
 .add {
 	margin-top: 1rem;
 }
@@ -102,6 +88,7 @@ import { niceDate } from '../util';
 
 // components
 import User from './user.vue';
+import Pill from './pill.vue';
 
 // store
 import appStore from '../store/app';
@@ -124,6 +111,7 @@ export default Vue.extend( {
 	},
 	components: {
 		'wl-user': User,
+		'wl-pill': Pill,
 	},
 	methods: {
 		async addComment() {
