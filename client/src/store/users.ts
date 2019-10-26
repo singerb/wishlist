@@ -9,6 +9,7 @@ import axios from 'axios';
 interface User {
 	id: number;
 	name: string;
+	years: Array<{ year: string, info: string }>;
 }
 
 export interface UsersState {

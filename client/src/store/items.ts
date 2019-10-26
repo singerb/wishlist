@@ -1,6 +1,8 @@
 import { RootState } from './store';
 import { getStoreBuilder } from 'vuex-typex';
 
+import appStore from './app';
+
 import axios from 'axios';
 
 // state
@@ -27,7 +29,8 @@ const setItemsWrapper = builder.commit( setItems );
 async function getItems() {
 	console.log( 'in store get items' );
 	try {
-		const items = await axios.get( '/api/items' );
+		const year = appStore.state.yearViewing;
+		const items = await axios.get( '/api/items/' + year );
 
 		setItemsWrapper( items.data );
 	} catch ( err ) {

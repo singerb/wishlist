@@ -8,34 +8,46 @@ import { Item } from '../models/item';
 import { User } from '../models/user';
 import { objsToApiJSON } from '../models/to-api';
 
+async function handleGetAll( req: express.Request, res: express.Response, year: string ) {
+	const userId = await getUser( req );
+	const user = await User.query().findById( userId );
+
+	if ( ! user ) {
+		logger.error( 'no user with id ' + userId + ' found' );
+		res.clearCookie( config.cookieName, config.cookieOptions );
+		res.sendStatus( 401 );
+
+		return;
+	}
+
+	// show all my items that are visible to me, plus everyone else's items
+	// eagerly get comments on items where I'm not the owner
+	const myItems = await Item.query()
+		.where( 'owner_id', '=', userId )
+		.andWhere( 'visible_to_owner', '=', true )
+		.andWhere( 'year', '=', year )
+		.eager( '[owner, creator, links]' );
+	const otherItems = await Item.query()
+		.where( 'owner_id', '!=', userId )
+		.andWhere( 'year', '=', year )
+		.eager( '[owner, creator, links, comments.[creator]]' );
+
+	const items = myItems.concat( otherItems );
+
+	res.send( objsToApiJSON( items ) );
+}
+
 export const itemsApi = {
 	async getAll( req: express.Request, res: express.Response ) {
-		const userId = await getUser( req );
-		const user = await User.query().findById( userId );
+		const year = new Date().getFullYear() + '';
 
-		if ( ! user ) {
-			logger.error( 'no user with id ' + userId + ' found' );
-			res.clearCookie( config.cookieName, config.cookieOptions );
-			res.sendStatus( 401 );
+		await handleGetAll( req, res, year );
+	},
 
-			return;
-		}
+	async getAllByYear( req: express.Request, res: express.Response ) {
+		const year = req.params.year ? req.params.year : ( new Date().getFullYear() + '' );
 
-		// show all my items that are visible to me, plus everyone else's items
-		// eagerly get comments on items where I'm not the owner
-		const myItems = await Item.query()
-			.where( 'owner_id', '=', userId )
-			.andWhere( 'visible_to_owner', '=', true )
-			.andWhere( 'year', '=', user.year_viewing )
-			.eager( '[owner, creator, links]' );
-		const otherItems = await Item.query()
-			.where( 'owner_id', '!=', userId )
-			.andWhere( 'year', '=', user.year_viewing )
-			.eager( '[owner, creator, links, comments.[creator]]' );
-
-		const items = myItems.concat( otherItems );
-
-		res.send( objsToApiJSON( items ) );
+		await handleGetAll( req, res, year );
 	},
 
 	async addItem( req: express.Request, res: express.Response ) {
@@ -69,7 +81,7 @@ export const itemsApi = {
 				owner_id: ownerId,
 				visible_to_owner: visible_to_owner,
 				links: links,
-				year: user.year_viewing,
+				year: '2019', // TODO: front-end needs to pass the year that's being viewed
 			},
 		);
 

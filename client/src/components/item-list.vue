@@ -46,7 +46,7 @@ export default Vue.extend( {
 			return itemsStore.state().items;
 		},
 		users() {
-			return usersStore.state().users;
+			return usersStore.state().users.filter( ( user ) => user.years.map( ( year ) => year.year ).includes( appStore.state.yearViewing ) );
 		},
 	},
 	methods: {

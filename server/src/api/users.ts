@@ -10,7 +10,17 @@ import { objToApiJSON, objsToApiJSON } from '../models/to-api';
 
 export const usersApi = {
 	async getAll( _: express.Request, res: express.Response ) {
-		const users = await User.query();
+		const users = await User.query().eager( 'years' );
+
+		res.send( objsToApiJSON( users ) );
+	},
+
+	async getYear( req: express.Request, res: express.Response ) {
+		const year = req.params.year ? req.params.year : ( new Date().getFullYear() );
+
+		const users = await User.query()
+			.where( 'year', '=', year )
+			.eager( 'years' );
 
 		res.send( objsToApiJSON( users ) );
 	},

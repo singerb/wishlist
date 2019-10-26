@@ -7,15 +7,18 @@ import { getStoreBuilder } from 'vuex-typex';
 import './app';
 import './users';
 import './items';
+import './years';
 
 import { AppState } from './app';
 import { UsersState } from './users';
 import { ItemsState } from './items';
+import { YearsState } from './years';
 
 export interface RootState {
 	app: AppState;
 	users: UsersState;
 	items: ItemsState;
+	years: YearsState;
 }
 
 Vue.use( Vuex );

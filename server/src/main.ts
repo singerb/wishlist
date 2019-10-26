@@ -33,6 +33,8 @@ async function main() {
 
 	// unauthenticated endpoints
 	router.get( '/api/users', wrapApi( api.users.getAll ) );
+	router.get( '/api/usersFor/:year', wrapApi( api.users.getYear ) );
+	router.get( '/api/years', wrapApi( api.years.getAll ) );
 	router.post( '/api/login', wrapApi( api.auth.login ) );
 	router.post( '/api/logout', wrapApi( api.auth.logout ) );
 
@@ -43,7 +45,8 @@ async function main() {
 	router.post( '/api/user/password', wrapApi( api.users.changePassword ) );
 
 	router.use( '/api/items/*', authCheck );
-	router.get( '/api/items', wrapApi( api.items.getAll ) );
+	router.get( '/api/items/', wrapApi( api.items.getAll ) );
+	router.get( '/api/items/:year', wrapApi( api.items.getAllByYear ) );
 	router.post( '/api/items', wrapApi( api.items.addItem ) );
 
 	router.use( '/api/comments/*', authCheck );

@@ -38,7 +38,6 @@ export const adminApi = {
 		const newUserName = req.body.newUserName;
 		const newPassword = generate( { length: 16, readable: true } );
 		const is_admin = req.body.is_admin;
-		const year_viewing = '2018'; // TODO: make this not hard-coded
 
 		if ( ! newUserName || newUserName === '' ) {
 			res.status( 400 ).send( { ok: false, error: 'New name cannot be empty' } );
@@ -46,7 +45,7 @@ export const adminApi = {
 			return;
 		}
 
-		const newUser = { name: newUserName, is_admin, year_viewing, password: bcrypt.hashSync( newPassword, 10 ) };
+		const newUser = { name: newUserName, is_admin, password: bcrypt.hashSync( newPassword, 10 ) };
 		logger.info( 'inserting user %o', newUser );
 		await User.query().insert( newUser );
 		logger.info( 'users now %o', await User.query() );
