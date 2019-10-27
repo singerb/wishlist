@@ -67,6 +67,7 @@ export const itemsApi = {
 		const ownerId = req.body.ownerId;
 		const visible_to_owner = ownerId === userId ? true : req.body.visible_to_owner;
 		const links = req.body.links;
+		const year = req.body.year || ( new Date().getFullYear() + '' );
 
 		if ( ! itemText || itemText === '' ) {
 			res.status( 400 ).send( { ok: false, error: 'Item text cannot be empty' } );
@@ -81,7 +82,7 @@ export const itemsApi = {
 				owner_id: ownerId,
 				visible_to_owner: visible_to_owner,
 				links: links,
-				year: '2019', // TODO: front-end needs to pass the year that's being viewed
+				year: year,
 			},
 		);
 

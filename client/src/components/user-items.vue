@@ -103,6 +103,7 @@ export default Vue.extend( {
 				ownerId: this.user.id,
 				visible_to_owner: this.visible_to_owner,
 				links: this.addingLinks,
+				year: appStore.state.yearViewing,
 			} );
 
 			this.text = '';

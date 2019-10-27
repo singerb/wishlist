@@ -55,7 +55,7 @@ async function addComment( _: any, payload: { text: string, itemId: number, clai
 async function addItem(
 	_: any,
 	payload: {
-		text: string, ownerId: number, visible_to_owner: boolean, links: Array<{ url: string }>,
+		text: string, ownerId: number, visible_to_owner: boolean, links: Array<{ url: string }>, year: string,
 	} ) {
 	console.log( 'in store add item' );
 	try {
