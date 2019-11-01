@@ -1,11 +1,11 @@
 <template>
 	<div class='navbar'>
 		<div v-if='loggedIn'>
-			<router-link to='/' tag='button' exact active-class='button-primary'>Items</router-link>
+			<router-link to='/items' tag='button' active-class='button-primary'>Items</router-link>
 			<router-link to='/profile' tag='button' exact active-class='button-primary'>User Profile</router-link>
 			<router-link to='/admin' tag='button' exact active-class='button-primary' v-if='user.is_admin'>Admin Settings</router-link>
 			<div style='display: inline-block;'>Welcome, {{ user.name }}!</div>
-			<div class='right'>
+			<div class='right' v-if='yearViewing'>
 				<label for='yearSelect' style='display: inline-block;'>Year</label>
 				<select v-model="yearViewing" id='yearSelect'>
 					<option v-for="year in years" :key='year.year' :value='year.year'>
@@ -78,20 +78,10 @@ export default Vue.extend( {
 				return appStore.state.yearViewing;
 			},
 			set( value: string ) {
-				appStore.setYearViewing( value );
-
-				// TODO: would be great if setting the year did this automatically
-				itemsStore.retrieveItems().catch( ( err ) => {
-					console.error( err );
-				});
+				// our routing will take care of updating the stat and getting new items
+				this.$router.push( '/items/' + value );
 			}
 		}
-		/*userName() {
-			return appStore.state.user.name;
-		},
-		isAdmin() {
-			return appStore.state.user.is_admin;
-		},*/
 	},
 	methods: {
 		async getUser() {

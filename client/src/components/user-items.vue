@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<h3>{{ user.name }}</h3>
-		<wl-item v-for='item in items' :key='item.id' v-if='item.owner.id == user.id' :item='item'></wl-item>
+		<wl-item v-for='item in items' :key='item.id' v-if='item.owner.id == user.id' :item='item' :year='year'></wl-item>
 		<div class='addItem'>
 		<div class='row'>
 			<div class='three columns'>
@@ -66,12 +66,10 @@ import itemsStore from '../store/items';
 
 export default Vue.extend( {
 	props: [ 'user' ],
-	created: function() {
-		this.getItems().catch( ( err ) => {
-			console.error( err );
-		} );
-	},
 	computed: {
+		year() {
+			return appStore.state.yearViewing;
+		},
 		items() {
 			return itemsStore.state().items;
 		},
@@ -94,16 +92,13 @@ export default Vue.extend( {
 		removeLink( index ) {
 			this.addingLinks.splice( index, 1 );
 		},
-		async getItems() {
-			await itemsStore.retrieveItems();
-		},
 		async addItem() {
 			await itemsStore.addItem( {
 				text: this.text,
 				ownerId: this.user.id,
 				visible_to_owner: this.visible_to_owner,
 				links: this.addingLinks,
-				year: appStore.state.yearViewing,
+				year: this.year,
 			} );
 
 			this.text = '';

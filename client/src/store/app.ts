@@ -13,13 +13,13 @@ interface User {
 export interface AppState {
 	loggedIn: boolean;
 	user: User;
-	yearViewing: string;
+	yearViewing: string | false;
 }
 
 // builder
 const builder = getStoreBuilder<RootState>().module<AppState>(
 	'app',
-	{ loggedIn: false, user: { id: -1, name: '', is_admin: false }, yearViewing: new Date().getFullYear() + '' },
+	{ loggedIn: false, user: { id: -1, name: '', is_admin: false }, yearViewing: false },
 );
 
 // mutations plus wrappers
@@ -32,7 +32,7 @@ function setUser( state: AppState, newUser?: User ) {
 	Object.assign( state.user, newUser );
 }
 
-function setYearViewing( state: AppState, newYearViewing: string ) {
+function setYearViewing( state: AppState, newYearViewing: string | false ) {
 	state.yearViewing = newYearViewing;
 }
 

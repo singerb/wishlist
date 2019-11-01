@@ -42,16 +42,19 @@ export default Vue.extend( {
 		} );
 	},
 	computed: {
+		year() {
+			return appStore.state.yearViewing;
+		},
 		items() {
 			return itemsStore.state().items;
 		},
 		users() {
-			return usersStore.state().users.filter( ( user ) => user.years.map( ( year ) => year.year ).includes( appStore.state.yearViewing ) );
+			return usersStore.state().users.filter( ( user ) => user.years.map( ( year ) => year.year ).includes( this.year ) );
 		},
 	},
 	methods: {
 		async getItems() {
-			await itemsStore.retrieveItems();
+			await itemsStore.retrieveItems( { year: this.year } );
 		},
 		async getUsers() {
 			await usersStore.retrieveUsers();

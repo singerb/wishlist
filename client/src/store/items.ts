@@ -1,8 +1,6 @@
 import { RootState } from './store';
 import { getStoreBuilder } from 'vuex-typex';
 
-import appStore from './app';
-
 import axios from 'axios';
 
 // state
@@ -26,10 +24,10 @@ function setItems( state: ItemsState, newItems: Item[] ) {
 const setItemsWrapper = builder.commit( setItems );
 
 // actions
-async function getItems() {
+async function getItems( _: any, payload: { year: string } ) {
 	console.log( 'in store get items' );
 	try {
-		const year = appStore.state.yearViewing;
+		const year = payload.year;
 		const items = await axios.get( '/api/items/' + year );
 
 		setItemsWrapper( items.data );
@@ -41,12 +39,12 @@ async function getItems() {
 
 const retrieveItems = builder.dispatch( getItems );
 
-async function addComment( _: any, payload: { text: string, itemId: number, claimed: boolean } ) {
+async function addComment( _: any, payload: { text: string, itemId: number, claimed: boolean, year: string } ) {
 	console.log( 'in store add comment' );
 	try {
 		await axios.post( '/api/comments', payload );
 
-		await retrieveItems();
+		await retrieveItems( { year: payload.year } );
 	} catch ( err ) {
 		console.error( err );
 	}
@@ -61,7 +59,7 @@ async function addItem(
 	try {
 		await axios.post( '/api/items', payload );
 
-		await retrieveItems();
+		await retrieveItems( { year: payload.year } );
 	} catch ( err ) {
 		console.error( err );
 	}
