@@ -6,7 +6,7 @@
 				<label for='userSelect'>User</label>
 				<select v-model="userSelect" id='userSelect'>
 					<option disabled :value='false'>Select a user to edit</option>
-					<option v-for="user in users" :key='user.id' :value='user.id'>
+					<option v-for="user in users" :key='user.id' :value='user'>
 						{{ user.name }}
 					</option>
 				</select>
@@ -49,8 +49,30 @@
 				</div>
 			</div>
 		</form>
+		<form v-on:submit.prevent='updateYears'>
+			<div class='row' v-if='yearsError'>
+				<div class='six columns'>
+					<p class='error'>{{ yearsError }}</p>
+				</div>
+			</div>
+			<div class='row'>
+				<div class='six columns'>
+					<label for='userYears'>Member of years</label>
+					<select v-model="userYears" id='userYears' multiple>
+						<option v-for="year in years" :key='year.year' :value='year.year'>
+							{{ year.year }} - {{ year.info }}
+						</option>
+					</select>
+				</div>
+			</div>
+			<div class='row'>
+				<div class='three columns'>
+					<input type='submit' value='Update Years' class='button-primary' />
+				</div>
+			</div>
+		</form>
 		<hr>
-		<p>Add a new user:</p>
+		<h3>Add a new user:</h3>
 		<form v-on:submit.prevent='addUser'>
 			<div class='row' v-if='addUserError'>
 				<div class='six columns'>
@@ -83,7 +105,7 @@
 			</div>
 		</form>
 		<hr>
-		<p>Remove a user:</p>
+		<h3>Remove a user:</h3>
 		<form v-on:submit.prevent='removeUser'>
 			<div class='row' v-if='removeUserError'>
 				<div class='six columns'>
@@ -116,6 +138,10 @@
 	color: red;
 }
 
+#userYears {
+	height: 8em;
+}
+
 </style>
 
 
@@ -129,6 +155,7 @@ import { errorText } from '../util';
 // store
 import appStore from '../store/app';
 import usersStore from '../store/users';
+import yearsStore from '../store/years';
 
 export default Vue.extend( {
 	created: function() {
@@ -139,6 +166,9 @@ export default Vue.extend( {
 	computed: {
 		users() {
 			return usersStore.state().users;
+		},
+		years() {
+			return yearsStore.state().years;
 		},
 		currentUser() {
 			return appStore.state.user;
@@ -154,6 +184,9 @@ export default Vue.extend( {
 			passwordError: false,
 			newPassword: false,
 
+			userYears: [],
+			yearsError: false,
+
 			newUserName: '',
 			newUserAdmin: false,
 			newUserError: false,
@@ -163,10 +196,14 @@ export default Vue.extend( {
 			removeUserError: false,
 		};
 	},
+	watch: {
+		userSelect: function ( newUser, oldUser ) {
+			this.newName = newUser.name;
+			this.userYears = newUser.years.map( ( year ) => year.year );
+		}
+	},
 	methods: {
 		async editName() {
-			// TODO: all these selects need updates to clear or set initial value when changed!
-
 			if ( this.newName === '' ) {
 				this.nameError = 'New name cannot be empty';
 
@@ -181,7 +218,7 @@ export default Vue.extend( {
 
 			this.nameError = false;
 			try {
-				await usersStore.editNameAdmin( { userId: this.userSelect, newName: this.newName } );
+				await usersStore.editNameAdmin( { userId: this.userSelect.id, newName: this.newName } );
 				this.newName = '';
 			} catch ( err ) {
 				this.nameError = errorText( err );
@@ -198,13 +235,24 @@ export default Vue.extend( {
 
 			this.passwordError = false;
 			try {
-				const result = await usersStore.resetPassword( { userId: this.userSelect } );
+				const result = await usersStore.resetPassword( { userId: this.userSelect.id } );
 
 				if ( result && result.data && result.data.result ) {
 					this.newPassword = result.data.result;
 				}
 			} catch ( err ) {
 				this.passwordError = errorText( err );
+			}
+		},
+		async updateYears() {
+			this.yearsError = false;
+			const prevId = this.userSelect.id;
+			try {
+				const result = await usersStore.updateYears( { userId: this.userSelect.id, years: this.userYears } );
+				// TODO: this is hacky and probably needed because we reload the whole users on update
+				this.userSelect = this.users.find( ( user ) => user.id === prevId );
+			} catch ( err ) {
+				this.yearsError = errorText( err );
 			}
 		},
 		async addUser() {

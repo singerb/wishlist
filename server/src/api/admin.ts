@@ -8,6 +8,7 @@ import { getUser } from '../auth';
 
 import { User } from '../models/user';
 import { logger } from '../logger';
+// import { Year } from '../models/year';
 
 export const adminApi = {
 	async editName( req: express.Request, res: express.Response ) {
@@ -69,4 +70,28 @@ export const adminApi = {
 		res.send( { ok: true } );
 	},
 
+	async updateYears( req: express.Request, res: express.Response ) {
+		const userId = req.body.userId;
+		const newYearIds = req.body.years;
+
+		// TODO: in theory this may be possible with upsertGraph; in practice, easier to just modify the join table
+		// especially since this never adds/removes years, just changes the relations
+		// const years = await Year.query().where(
+		// 	'year', 'in', newYearIds,
+		// );
+
+		// await User.query().upsertGraph(
+		// 	{
+		// 		id: userId,
+		// 		years,
+		// 	},
+		// );
+		const knex = User.knex();
+		knex( 'years_to_users' ).delete().where( { user_id: userId } ).then( () => {
+			knex( 'years_to_users' ).insert(
+				newYearIds.map( ( yearId: string ) => ( { user_id: userId, year: yearId } ) ) ).then( () => {
+				res.send( { ok: true } );
+			} );
+		} );
+	},
 };

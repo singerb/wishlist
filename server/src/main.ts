@@ -58,6 +58,7 @@ async function main() {
 	router.post( '/api/admin/user/remove', wrapApi( api.admin.removeUser ) );
 	router.post( '/api/admin/user/reset', wrapApi( api.admin.resetPassword ) );
 	router.post( '/api/admin/user/edit', wrapApi( api.admin.editName ) );
+	router.post( '/api/admin/user/years', wrapApi( api.admin.updateYears ) );
 
 	router.listen( 3000, () => { logger.info( 'API ready on port 3000' ); } );
 }
