@@ -1,22 +1,25 @@
 <template>
 	<div>
+		<h3>Edit a user:</h3>
+		<div class='row'>
+			<div class='four columns'>
+				<label for='userSelect'>User</label>
+				<select v-model="userSelect" id='userSelect'>
+					<option disabled :value='false'>Select a user to edit</option>
+					<option v-for="user in users" :key='user.id' :value='user.id'>
+						{{ user.name }}
+					</option>
+				</select>
+			</div>
+		</div>
 		<p>Change a name:</p>
 		<form v-on:submit.prevent='editName'>
-			<div class='row' v-if='nameError'>
+			<div class='row' v-if='userNameError'>
 				<div class='six columns'>
-					<p class='error'>{{ nameError }}</p>
+					<p class='error'>{{ userNameError }}</p>
 				</div>
 			</div>
 			<div class='row'>
-				<div class='four columns'>
-					<label for='userSelectName'>User</label>
-					<select v-model="userSelectName" id='userSelectName'>
-						<option disabled :value='false'>Select a user to edit their name</option>
-						<option v-for="user in users" :key='user.id' :value='user.id'>
-							{{ user.name }}
-						</option>
-					</select>
-				</div>
 				<div class='six columns'>
 					<label for='newName'>New name</label>
 					<input v-model='newName' id='newName' type='text' class='u-full-width' placeholder="New name" />
@@ -28,7 +31,6 @@
 				</div>
 			</div>
 		</form>
-		<hr>
 		<p>Reset a password:</p>
 		<form v-on:submit.prevent='resetPassword'>
 			<div class='row' v-if='passwordError'>
@@ -39,17 +41,6 @@
 			<div class='row' v-if='newPassword'>
 				<div class='six columns'>
 					<p class='success'>Password was reset to: {{ newPassword }}</p>
-				</div>
-			</div>
-			<div class='row'>
-				<div class='four columns'>
-					<label for='userSelectPassword'>User</label>
-					<select v-model="resetPasswordFor" id='userSelectPassword'>
-						<option disabled :value='false'>Select a user to reset their password</option>
-						<option v-for="user in users" :key='user.id' :value='user.id'>
-							{{ user.name }}
-						</option>
-					</select>
 				</div>
 			</div>
 			<div class='row'>
@@ -84,6 +75,8 @@
 						<span class='label-body'>Make this user an admin</span>
 					</label>
 				</div>
+			</div>
+			<div class='row'>
 				<div class='three columns'>
 					<input type='submit' value='Add User' class='button-primary' />
 				</div>
@@ -153,11 +146,11 @@ export default Vue.extend( {
 	},
 	data() {
 		return {
-			userSelectName: false,
+			userSelect: false,
+
 			newName: '',
 			nameError: false,
 
-			resetPasswordFor: false,
 			passwordError: false,
 			newPassword: false,
 
@@ -180,7 +173,7 @@ export default Vue.extend( {
 				return;
 			}
 
-			if ( ! this.userSelectName ) {
+			if ( ! this.userSelect ) {
 				this.nameError = 'Select a user to edit their name';
 
 				return;
@@ -188,7 +181,8 @@ export default Vue.extend( {
 
 			this.nameError = false;
 			try {
-				await usersStore.editNameAdmin( { userId: this.userSelectName, newName: this.newName } );
+				await usersStore.editNameAdmin( { userId: this.userSelect, newName: this.newName } );
+				this.newName = '';
 			} catch ( err ) {
 				this.nameError = errorText( err );
 			}
@@ -196,7 +190,7 @@ export default Vue.extend( {
 		async resetPassword() {
 			this.newPassword = false;
 
-			if ( ! this.resetPasswordFor ) {
+			if ( ! this.userSelect ) {
 				this.passwordError = 'Select a user to reset their password';
 
 				return;
@@ -204,7 +198,7 @@ export default Vue.extend( {
 
 			this.passwordError = false;
 			try {
-				const result = await usersStore.resetPassword( { userId: this.resetPasswordFor } );
+				const result = await usersStore.resetPassword( { userId: this.userSelect } );
 
 				if ( result && result.data && result.data.result ) {
 					this.newPassword = result.data.result;
