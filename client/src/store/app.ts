@@ -8,18 +8,18 @@ interface User {
 	id: number;
 	name: string;
 	is_admin: boolean;
-	year_viewing: number;
 }
 
 export interface AppState {
 	loggedIn: boolean;
 	user: User;
+	yearViewing: string | false;
 }
 
 // builder
 const builder = getStoreBuilder<RootState>().module<AppState>(
 	'app',
-	{ loggedIn: false, user: { id: -1, name: '', is_admin: false, year_viewing: -1 } },
+	{ loggedIn: false, user: { id: -1, name: '', is_admin: false }, yearViewing: false },
 );
 
 // mutations plus wrappers
@@ -30,6 +30,10 @@ function setLoggedIn( state: AppState, newLoggedIn: boolean ) {
 function setUser( state: AppState, newUser?: User ) {
 	// state.user = newUser;
 	Object.assign( state.user, newUser );
+}
+
+function setYearViewing( state: AppState, newYearViewing: string | false ) {
+	state.yearViewing = newYearViewing;
 }
 
 const setLoggedInWrapper = builder.commit( setLoggedIn );
@@ -49,7 +53,7 @@ async function checkUser() {
 		// TODO: distinguish the 401 by code
 		console.error( err );
 		setLoggedInWrapper( false );
-		setUserWrapper( { id: -1, name: '', is_admin: false, year_viewing: -1 } );
+		setUserWrapper( { id: -1, name: '', is_admin: false } );
 	}
 }
 
@@ -85,6 +89,7 @@ async function logout() {
 export default {
 	get state() { return builder.state()(); },
 
+	setYearViewing: builder.commit( setYearViewing ),
 	checkUser: checkUserWrapper,
 	login: builder.dispatch( login ),
 	logout: builder.dispatch( logout ),

@@ -9,6 +9,7 @@ import axios from 'axios';
 interface User {
 	id: number;
 	name: string;
+	years: Array<{ year: string, info: string }>;
 }
 
 export interface UsersState {
@@ -117,10 +118,28 @@ async function removeUser(
 	console.log( 'in store remove user admin' );
 
 	// pass errors or result up to caller
-	const result = axios.post( '/api/admin/user/remove', payload );
+	const result = await axios.post( '/api/admin/user/remove', payload );
 
 	try {
 		// TODO: doesn't seem to notice the removal?
+		await retrieveUsers();
+	} catch ( err ) {
+		console.error( err );
+	}
+
+	return result;
+}
+
+async function updateYears(
+	_: any,
+	payload: { userId: number, years: string[] },
+) {
+	console.log( 'in store update years admin' );
+
+	// pass errors or result up to caller
+	const result = await axios.post( '/api/admin/user/years', payload );
+
+	try {
 		await retrieveUsers();
 	} catch ( err ) {
 		console.error( err );
@@ -141,4 +160,5 @@ export default {
 	resetPassword: builder.dispatch( resetPassword ),
 	addUser: builder.dispatch( addUser ),
 	removeUser: builder.dispatch( removeUser ),
+	updateYears: builder.dispatch( updateYears ),
 };

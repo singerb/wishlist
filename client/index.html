@@ -5,15 +5,15 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>Holiday Wishlist</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" type="text/css" media="screen" href="css/normalize.css" />
-	<link rel="stylesheet" type="text/css" media="screen" href="css/skeleton.css" />
-	<link rel="stylesheet" type="text/css" media="screen" href="css/style.css" />
-	<link rel="stylesheet" type="text/css" media="screen" href="css/components.css" />
-	<script src="js/main.js"></script>
+	<link rel="stylesheet" type="text/css" media="screen" href="/css/normalize.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="/css/skeleton.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="/css/style.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="/css/components.css" />
+	<script src="/js/main.js"></script>
 </head>
 <body>
 	<div id='app'>
-		<wl-navbar></wl-navbar>
+		<router-view name='navbar'></router-view>
 		<div class='container' style='margin-top: 8rem;'>
 			<h1>Holiday Wishlist</h1>
 			<router-view></router-view>

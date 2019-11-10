@@ -24,10 +24,11 @@ function setItems( state: ItemsState, newItems: Item[] ) {
 const setItemsWrapper = builder.commit( setItems );
 
 // actions
-async function getItems() {
+async function getItems( _: any, payload: { year: string } ) {
 	console.log( 'in store get items' );
 	try {
-		const items = await axios.get( '/api/items' );
+		const year = payload.year;
+		const items = await axios.get( '/api/items/' + year );
 
 		setItemsWrapper( items.data );
 	} catch ( err ) {
@@ -38,12 +39,12 @@ async function getItems() {
 
 const retrieveItems = builder.dispatch( getItems );
 
-async function addComment( _: any, payload: { text: string, itemId: number, claimed: boolean } ) {
+async function addComment( _: any, payload: { text: string, itemId: number, claimed: boolean, year: string } ) {
 	console.log( 'in store add comment' );
 	try {
 		await axios.post( '/api/comments', payload );
 
-		await retrieveItems();
+		await retrieveItems( { year: payload.year } );
 	} catch ( err ) {
 		console.error( err );
 	}
@@ -52,13 +53,13 @@ async function addComment( _: any, payload: { text: string, itemId: number, clai
 async function addItem(
 	_: any,
 	payload: {
-		text: string, ownerId: number, visible_to_owner: boolean, links: Array<{ url: string }>,
+		text: string, ownerId: number, visible_to_owner: boolean, links: Array<{ url: string }>, year: string,
 	} ) {
 	console.log( 'in store add item' );
 	try {
 		await axios.post( '/api/items', payload );
 
-		await retrieveItems();
+		await retrieveItems( { year: payload.year } );
 	} catch ( err ) {
 		console.error( err );
 	}

@@ -8,6 +8,8 @@ import { getUser } from '../auth';
 
 import { User } from '../models/user';
 import { logger } from '../logger';
+import { Year } from '../models/year';
+// import { Year } from '../models/year';
 
 export const adminApi = {
 	async editName( req: express.Request, res: express.Response ) {
@@ -38,7 +40,6 @@ export const adminApi = {
 		const newUserName = req.body.newUserName;
 		const newPassword = generate( { length: 16, readable: true } );
 		const is_admin = req.body.is_admin;
-		const year_viewing = '2018'; // TODO: make this not hard-coded
 
 		if ( ! newUserName || newUserName === '' ) {
 			res.status( 400 ).send( { ok: false, error: 'New name cannot be empty' } );
@@ -46,7 +47,7 @@ export const adminApi = {
 			return;
 		}
 
-		const newUser = { name: newUserName, is_admin, year_viewing, password: bcrypt.hashSync( newPassword, 10 ) };
+		const newUser = { name: newUserName, is_admin, password: bcrypt.hashSync( newPassword, 10 ) };
 		logger.info( 'inserting user %o', newUser );
 		await User.query().insert( newUser );
 		logger.info( 'users now %o', await User.query() );
@@ -70,4 +71,80 @@ export const adminApi = {
 		res.send( { ok: true } );
 	},
 
+	async updateYears( req: express.Request, res: express.Response ) {
+		const userId = req.body.userId;
+		const newYearIds = req.body.years;
+
+		// TODO: in theory this may be possible with upsertGraph; in practice, easier to just modify the join table
+		// especially since this never adds/removes years, just changes the relations
+		// const years = await Year.query().where(
+		// 	'year', 'in', newYearIds,
+		// );
+
+		// await User.query().upsertGraph(
+		// 	{
+		// 		id: userId,
+		// 		years,
+		// 	},
+		// );
+		const knex = User.knex();
+		knex( 'years_to_users' ).delete().where( { user_id: userId } ).then( () => {
+			knex( 'years_to_users' ).insert(
+				newYearIds.map( ( yearId: string ) => ( { user_id: userId, year: yearId } ) ) ).then( () => {
+				res.send( { ok: true } );
+			} );
+		} );
+	},
+
+	async addYear( req: express.Request, res: express.Response ) {
+		const newYear = req.body.newYear;
+		const newYearInfo = req.body.newYearInfo;
+		const newYearMembers = req.body.newYearMembers || [];
+
+		if ( ! newYear || newYear === '' ) {
+			res.status( 400 ).send( { ok: false, error: 'New year cannot be empty' } );
+
+			return;
+		}
+
+		if ( ! newYearInfo || newYearInfo === '' ) {
+			res.status( 400 ).send( { ok: false, error: 'New year info cannot be empty' } );
+
+			return;
+		}
+
+		await Year.query().insert( { year: newYear, info: newYearInfo } );
+		if ( newYearMembers.length > 0 ) {
+			// TODO: once again resorting to knex here
+			const knex = User.knex();
+			knex( 'years_to_users' ).insert(
+				newYearMembers.map( ( userId: string ) => ( { user_id: userId, year: newYear } ) ) ).then( () => {
+				res.send( { ok: true } );
+			} );
+		}
+	},
+
+	async removeYear( req: express.Request, res: express.Response ) {
+		const year = req.body.year;
+
+		// TODO: should cascade but needs testing
+		await Year.query().delete().where( 'year', '=', year );
+
+		res.send( { ok: true } );
+	},
+
+	async editYear( req: express.Request, res: express.Response ) {
+		const year = req.body.year;
+		const newInfo = req.body.newInfo;
+
+		if ( ! newInfo || newInfo === '' ) {
+			res.status( 400 ).send( { ok: false, error: 'New year info cannot be empty' } );
+
+			return;
+		}
+
+		await Year.query().update( { info: newInfo } ).where( 'year', '=', year );
+
+		res.send( { ok: true } );
+	},
 };

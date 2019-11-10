@@ -96,7 +96,7 @@ import itemsStore from '../store/items';
 // import usersStore from '../store/users';
 
 export default Vue.extend( {
-	props: [ 'item' ],
+	props: [ 'item', 'year' ],
 	computed: {
 		currentUser() {
 			return appStore.state.user;
@@ -115,7 +115,7 @@ export default Vue.extend( {
 	},
 	methods: {
 		async addComment() {
-			await itemsStore.addComment( { text: this.text, itemId: this.item.id, claimed: this.claimed } );
+			await itemsStore.addComment( { text: this.text, itemId: this.item.id, claimed: this.claimed, year: this.year } );
 			this.text = '';
 			this.claimed = false;
 		},

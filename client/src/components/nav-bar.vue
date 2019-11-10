@@ -1,11 +1,19 @@
 <template>
 	<div class='navbar'>
 		<div v-if='loggedIn'>
-			<router-link to='/' tag='button' exact active-class='button-primary'>Items</router-link>
+			<router-link to='/items' tag='button' active-class='button-primary'>Items</router-link>
 			<router-link to='/profile' tag='button' exact active-class='button-primary'>User Profile</router-link>
 			<router-link to='/admin' tag='button' exact active-class='button-primary' v-if='user.is_admin'>Admin Settings</router-link>
 			<div style='display: inline-block;'>Welcome, {{ user.name }}!</div>
-			<button class='right' v-on:click.prevent='logout'>Logout</button>
+			<div class='right' v-if='yearViewing'>
+				<label for='yearSelect' style='display: inline-block;'>Year</label>
+				<select v-model="yearViewing" id='yearSelect'>
+					<option v-for="year in years" :key='year.year' :value='year.year'>
+						{{ year.year }} - {{ year.info }}
+					</option>
+				</select>
+				<button v-on:click.prevent='logout'>Logout</button>
+			</div>
 		</div>
 		<div v-else>
 			<button v-on:click.prevent='nothing'>Logged Out</button>
@@ -43,10 +51,15 @@ import Vue from 'vue';
 
 // store
 import appStore from '../store/app';
+import yearsStore from '../store/years';
+import itemsStore from '../store/items';
 
 export default Vue.extend( {
 	created: function() {
 		this.getUser().catch( ( err ) => {
+			console.error( err );
+		} );
+		this.getYears().catch( ( err ) => {
 			console.error( err );
 		} );
 	},
@@ -57,12 +70,18 @@ export default Vue.extend( {
 		loggedIn() {
 			return appStore.state.loggedIn;
 		},
-		/*userName() {
-			return appStore.state.user.name;
+		years() {
+			return yearsStore.state().years;
 		},
-		isAdmin() {
-			return appStore.state.user.is_admin;
-		},*/
+		yearViewing: {
+			get() {
+				return appStore.state.yearViewing;
+			},
+			set( value: string ) {
+				// our routing will take care of updating the stat and getting new items
+				this.$router.push( '/items/' + value );
+			}
+		}
 	},
 	methods: {
 		async getUser() {
@@ -71,6 +90,9 @@ export default Vue.extend( {
 		async logout() {
 			await appStore.logout();
 			this.$router.push( '/login' );
+		},
+		async getYears() {
+			await yearsStore.retrieveYears();
 		},
 		nothing() {
 			// do nothing

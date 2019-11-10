@@ -13,6 +13,7 @@ import AdminSettings from './components/admin-settings.vue';
 // store
 import store from './store/store';
 import appStore, { AppState } from './store/app';
+import itemStore from './store/items';
 
 class Wishlist {
 	public async run() {
@@ -24,28 +25,49 @@ class Wishlist {
 			routes: [
 				{
 					path: '/',
-					component: ItemList,
+					redirect: ( _ ) => '/items/' + new Date().getFullYear(),
+				},
+				{
+					path: '/items',
+					redirect: ( _ ) => '/items/' + new Date().getFullYear(),
+				},
+				{
+					path: '/items/:year',
+					name: 'items',
+					components: {
+						default: ItemList,
+						navbar: NavBar,
+					},
 					meta: {
 						requiresAuth: true,
 					},
 				},
 				{
 					path: '/login',
-					component: LoginList,
+					components: {
+						default: LoginList,
+						navbar: NavBar,
+					},
 					meta: {
 						guest: true,
 					},
 				},
 				{
 					path: '/profile',
-					component: UserProfile,
+					components: {
+						default: UserProfile,
+						navbar: NavBar,
+					},
 					meta: {
 						requiresAuth: true,
 					},
 				},
 				{
 					path: '/admin',
-					component: AdminSettings,
+					components: {
+						default: AdminSettings,
+						navbar: NavBar,
+					},
 					meta: {
 						requiresAuth: true,
 						requiresAdmin: true,
@@ -55,6 +77,15 @@ class Wishlist {
 		} );
 
 		router.beforeEach( ( to, _, next ) => {
+			if ( to.name && to.name === 'items' && to.params.year ) {
+				appStore.setYearViewing( to.params.year );
+				itemStore.retrieveItems( {
+					year: appStore.state.yearViewing as string,
+				} ).catch( ( err ) => { console.error( err ); } );
+			} else {
+				appStore.setYearViewing( false );
+			}
+
 			if ( to.matched.some( ( record ) => record.meta.requiresAuth ) ) {
 				if ( !appStore.state.loggedIn ) {
 					console.log( 'route requires login, redirecting' );

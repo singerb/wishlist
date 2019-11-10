@@ -33,6 +33,8 @@ async function main() {
 
 	// unauthenticated endpoints
 	router.get( '/api/users', wrapApi( api.users.getAll ) );
+	router.get( '/api/usersFor/:year', wrapApi( api.users.getYear ) );
+	router.get( '/api/years', wrapApi( api.years.getAll ) );
 	router.post( '/api/login', wrapApi( api.auth.login ) );
 	router.post( '/api/logout', wrapApi( api.auth.logout ) );
 
@@ -43,7 +45,8 @@ async function main() {
 	router.post( '/api/user/password', wrapApi( api.users.changePassword ) );
 
 	router.use( '/api/items/*', authCheck );
-	router.get( '/api/items', wrapApi( api.items.getAll ) );
+	router.get( '/api/items/', wrapApi( api.items.getAll ) );
+	router.get( '/api/items/:year', wrapApi( api.items.getAllByYear ) );
 	router.post( '/api/items', wrapApi( api.items.addItem ) );
 
 	router.use( '/api/comments/*', authCheck );
@@ -55,6 +58,10 @@ async function main() {
 	router.post( '/api/admin/user/remove', wrapApi( api.admin.removeUser ) );
 	router.post( '/api/admin/user/reset', wrapApi( api.admin.resetPassword ) );
 	router.post( '/api/admin/user/edit', wrapApi( api.admin.editName ) );
+	router.post( '/api/admin/user/years', wrapApi( api.admin.updateYears ) );
+	router.post( '/api/admin/year/add', wrapApi( api.admin.addYear ) );
+	router.post( '/api/admin/year/remove', wrapApi( api.admin.removeYear ) );
+	router.post( '/api/admin/year/edit', wrapApi( api.admin.editYear ) );
 
 	router.listen( 3000, () => { logger.info( 'API ready on port 3000' ); } );
 }
