@@ -8,6 +8,7 @@ import { getUser } from '../auth';
 
 import { User } from '../models/user';
 import { logger } from '../logger';
+import { Year } from '../models/year';
 // import { Year } from '../models/year';
 
 export const adminApi = {
@@ -93,5 +94,42 @@ export const adminApi = {
 				res.send( { ok: true } );
 			} );
 		} );
+	},
+
+	async addYear( req: express.Request, res: express.Response ) {
+		const newYear = req.body.newYear;
+		const newYearInfo = req.body.newYearInfo;
+		const newYearMembers = req.body.newYearMembers || [];
+
+		if ( ! newYear || newYear === '' ) {
+			res.status( 400 ).send( { ok: false, error: 'New year cannot be empty' } );
+
+			return;
+		}
+
+		if ( ! newYearInfo || newYearInfo === '' ) {
+			res.status( 400 ).send( { ok: false, error: 'New year info cannot be empty' } );
+
+			return;
+		}
+
+		await Year.query().insert( { year: newYear, info: newYearInfo } );
+		if ( newYearMembers.length > 0 ) {
+			// TODO: once again resorting to knex here
+			const knex = User.knex();
+			knex( 'years_to_users' ).insert(
+				newYearMembers.map( ( userId: string ) => ( { user_id: userId, year: newYear } ) ) ).then( () => {
+				res.send( { ok: true } );
+			} );
+		}
+	},
+
+	async removeYear( req: express.Request, res: express.Response ) {
+		const year = req.body.year;
+
+		// TODO: should cascade but needs testing
+		await Year.query().delete().where( 'year', '=', year );
+
+		res.send( { ok: true } );
 	},
 };

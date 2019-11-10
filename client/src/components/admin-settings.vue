@@ -58,7 +58,7 @@
 			<div class='row'>
 				<div class='six columns'>
 					<label for='userYears'>Member of years</label>
-					<select v-model="userYears" id='userYears' multiple>
+					<select v-model="userYears" id='userYears' multiple class='yearSelect'>
 						<option v-for="year in years" :key='year.year' :value='year.year'>
 							{{ year.year }} - {{ year.info }}
 						</option>
@@ -129,6 +129,67 @@
 				</div>
 			</div>
 		</form>
+		<hr>
+		<h3>Add a new year:</h3>
+		<form v-on:submit.prevent='addYear'>
+			<div class='row' v-if='addYearError'>
+				<div class='six columns'>
+					<p class='error'>{{ addYearError }}</p>
+				</div>
+			</div>
+			<div class='row'>
+				<div class='six columns'>
+					<label for='newYear'>New year</label>
+					<input v-model='newYear' id='newYear' type='text' class='u-full-width' placeholder="New year" />
+				</div>
+			</div>
+			<div class='row'>
+				<div class='six columns'>
+					<label for='newYearInfo'>New year info</label>
+					<input v-model='newYearInfo' id='newYearInfo' type='text' class='u-full-width' placeholder="New year info" />
+				</div>
+			</div>
+			<div class='row'>
+				<div class='six columns'>
+					<label for='userYears'>Initial members</label>
+					<select v-model="yearUsers" id='yearUsers' multiple class='yearSelect'>
+						<option v-for="user in users" :key='user.id' :value='user.id'>
+							{{ user.name }}
+						</option>
+					</select>
+				</div>
+			</div>
+			<div class='row'>
+				<div class='three columns'>
+					<input type='submit' value='Add Year' class='button-primary' />
+				</div>
+			</div>
+		</form>
+		<hr>
+		<h3>Remove a year:</h3>
+		<form v-on:submit.prevent='removeYear'>
+			<div class='row' v-if='removeYearError'>
+				<div class='six columns'>
+					<p class='error'>{{ removeYearError }}</p>
+				</div>
+			</div>
+			<div class='row'>
+				<div class='four columns'>
+					<label for='yearSelectRemove'>Year</label>
+					<select v-model="removeYearSelect" id='yearSelectRemove'>
+						<option disabled :value='false'>Select a year to remove it</option>
+						<option v-for="year in years" :key='year.year' :value='year.year'>
+							{{ year.year }} - {{ year.info }}
+						</option>
+					</select>
+				</div>
+			</div>
+			<div class='row'>
+				<div class='three columns'>
+					<input type='submit' value='Remove Year' class='button-primary' />
+				</div>
+			</div>
+		</form>
 	</div>
 </template>
 
@@ -138,7 +199,7 @@
 	color: red;
 }
 
-#userYears {
+.yearSelect {
 	height: 8em;
 }
 
@@ -194,6 +255,14 @@ export default Vue.extend( {
 
 			removeUserId: false,
 			removeUserError: false,
+
+			addYearError: false,
+			newYear: '',
+			newYearInfo: '',
+			yearUsers: [],
+
+			removeYearError: false,
+			removeYearSelect: false,
 		};
 	},
 	watch: {
@@ -253,6 +322,30 @@ export default Vue.extend( {
 				this.userSelect = this.users.find( ( user ) => user.id === prevId );
 			} catch ( err ) {
 				this.yearsError = errorText( err );
+			}
+		},
+		async addYear() {
+			this.addYearError = false;
+			try {
+				const result = await yearsStore.addYear( {
+					newYear: this.newYear, newYearInfo: this.newYearInfo, newYearMembers: this.yearUsers
+				} );
+			} catch ( err ) {
+				this.addYearError = errorText( err );
+			}
+		},
+		async removeYear() {
+			if ( ! this.removeYearSelect ) {
+				this.nameError = 'Select a year to remove it';
+
+				return;
+			}
+
+			this.removeYearError = false;
+			try {
+				const result = await yearsStore.removeYear( { year: this.removeYearSelect } );
+			} catch ( err ) {
+				this.removeYearError = errorText( err );
 			}
 		},
 		async addUser() {

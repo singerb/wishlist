@@ -39,9 +39,48 @@ async function getYears() {
 
 const retrieveYears = builder.dispatch( getYears );
 
+async function addYear(
+	_: any,
+	payload: { newYear: string, newYearInfo: string, newYearMembers?: number[] },
+) {
+	console.log( 'in store add year admin' );
+
+	// pass errors or result up to caller
+	const result = await axios.post( '/api/admin/year/add', payload );
+
+	try {
+		await retrieveYears();
+	} catch ( err ) {
+		console.error( err );
+	}
+
+	return result;
+}
+
+async function removeYear(
+	_: any,
+	payload: { year: string },
+) {
+	console.log( 'in store remove year admin' );
+
+	// pass errors or result up to caller
+	const result = await axios.post( '/api/admin/year/remove', payload );
+
+	try {
+		// TODO: doesn't seem to notice the removal?
+		await retrieveYears();
+	} catch ( err ) {
+		console.error( err );
+	}
+
+	return result;
+}
+
 // for consumers
 export default {
 	get state() { return builder.state(); },
 
 	retrieveYears: retrieveYears,
+	addYear: builder.dispatch( addYear ),
+	removeYear: builder.dispatch( removeYear ),
 };
