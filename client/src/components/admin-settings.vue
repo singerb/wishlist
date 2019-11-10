@@ -166,6 +166,37 @@
 			</div>
 		</form>
 		<hr>
+		<h3>Edit a year:</h3>
+		<form v-on:submit.prevent='editYear'>
+			<div class='row' v-if='editYearError'>
+				<div class='six columns'>
+					<p class='error'>{{ editYearError }}</p>
+				</div>
+			</div>
+			<div class='row'>
+				<div class='four columns'>
+					<label for='yearSelectEdit'>Year</label>
+					<select v-model="editYearSelect" id='yearSelectEdit'>
+						<option disabled :value='false'>Select a year to edit it</option>
+						<option v-for="year in years" :key='year.year' :value='year'>
+							{{ year.year }} - {{ year.info }}
+						</option>
+					</select>
+				</div>
+			</div>
+			<div class='row'>
+				<div class='six columns'>
+					<label for='newInfo'>New info</label>
+					<input v-model='newInfo' id='newInfo' type='text' class='u-full-width' placeholder="New info" />
+				</div>
+			</div>
+			<div class='row'>
+				<div class='three columns'>
+					<input type='submit' value='Edit Year' class='button-primary' />
+				</div>
+			</div>
+		</form>
+		<hr>
 		<h3>Remove a year:</h3>
 		<form v-on:submit.prevent='removeYear'>
 			<div class='row' v-if='removeYearError'>
@@ -263,13 +294,20 @@ export default Vue.extend( {
 
 			removeYearError: false,
 			removeYearSelect: false,
+
+			editYearError: false,
+			editYearSelect: false,
+			newInfo: '',
 		};
 	},
 	watch: {
 		userSelect: function ( newUser, oldUser ) {
 			this.newName = newUser.name;
 			this.userYears = newUser.years.map( ( year ) => year.year );
-		}
+		},
+		editYearSelect: function ( newYear, oldYear ) {
+			this.newInfo = newYear.info;
+		},
 	},
 	methods: {
 		async editName() {
@@ -332,6 +370,31 @@ export default Vue.extend( {
 				} );
 			} catch ( err ) {
 				this.addYearError = errorText( err );
+			}
+		},
+		async editYear() {
+			if ( this.newInfo === '' ) {
+				this.editYearError = 'New info cannot be empty';
+
+				return;
+			}
+
+			if ( ! this.editYearSelect ) {
+				this.editYearError = 'Select a year to edit the info';
+
+				return;
+			}
+
+			this.editYearError = false;
+			const prevYear = this.editYearSelect.year;
+			try {
+				await yearsStore.editYear( { year: this.editYearSelect.year, newInfo: this.newInfo } );
+				this.newInfo = '';
+
+				// TODO: this is hacky and probably needed because we reload the whole years on update
+				this.editYearSelect = this.years.find( ( year ) => year.year === prevYear );
+			} catch ( err ) {
+				this.editYearError = errorText( err );
 			}
 		},
 		async removeYear() {

@@ -76,6 +76,25 @@ async function removeYear(
 	return result;
 }
 
+async function editYear(
+	_: any,
+	payload: { year: string, newInfo: string },
+) {
+	console.log( 'in store edit year admin' );
+
+	// pass errors or result up to caller
+	const result = await axios.post( '/api/admin/year/edit', payload );
+
+	try {
+		// TODO: doesn't seem to notice the removal?
+		await retrieveYears();
+	} catch ( err ) {
+		console.error( err );
+	}
+
+	return result;
+}
+
 // for consumers
 export default {
 	get state() { return builder.state(); },
@@ -83,4 +102,5 @@ export default {
 	retrieveYears: retrieveYears,
 	addYear: builder.dispatch( addYear ),
 	removeYear: builder.dispatch( removeYear ),
+	editYear: builder.dispatch( editYear ),
 };

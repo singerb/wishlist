@@ -132,4 +132,19 @@ export const adminApi = {
 
 		res.send( { ok: true } );
 	},
+
+	async editYear( req: express.Request, res: express.Response ) {
+		const year = req.body.year;
+		const newInfo = req.body.newInfo;
+
+		if ( ! newInfo || newInfo === '' ) {
+			res.status( 400 ).send( { ok: false, error: 'New year info cannot be empty' } );
+
+			return;
+		}
+
+		await Year.query().update( { info: newInfo } ).where( 'year', '=', year );
+
+		res.send( { ok: true } );
+	},
 };
