@@ -65,6 +65,32 @@ async function addItem(
 	}
 }
 
+async function duplicateItem(
+	_: any,
+	payload: { itemId: number, year: string } ) {
+	console.log( 'in store duplicate item' );
+	try {
+		await axios.post( '/api/items/duplicate', payload );
+
+		await retrieveItems( { year: payload.year } );
+	} catch ( err ) {
+		console.error( err );
+	}
+}
+
+async function removeItem(
+	_: any,
+	payload: { itemId: number, year: string } ) {
+	console.log( 'in store remove item' );
+	try {
+		await axios.post( '/api/items/remove', payload );
+
+		await retrieveItems( { year: payload.year } );
+	} catch ( err ) {
+		console.error( err );
+	}
+}
+
 // for consumers
 export default {
 	get state() { return builder.state(); },
@@ -72,4 +98,6 @@ export default {
 	retrieveItems: retrieveItems,
 	addComment: builder.dispatch( addComment ),
 	addItem: builder.dispatch( addItem ),
+	duplicateItem: builder.dispatch( duplicateItem ),
+	removeItem: builder.dispatch( removeItem ),
 };

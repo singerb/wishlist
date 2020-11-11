@@ -88,4 +88,96 @@ export const itemsApi = {
 
 		res.send( { ok: true } );
 	},
+
+	async duplicateItem( req: express.Request, res: express.Response ) {
+		const userId = await getUser( req );
+		const user = await User.query().findById( userId );
+
+		if ( ! user ) {
+			logger.error( 'no user with id ' + userId + ' found' );
+			res.clearCookie( config.cookieName, config.cookieOptions );
+			res.sendStatus( 401 );
+
+			return;
+		}
+
+		// logger.info( 'add item with %o', req.body );
+		const itemId = req.body.itemId;
+
+		if ( ! itemId ) {
+			res.status( 400 ).send( { ok: false, error: 'Item ID cannot be empty' } );
+
+			return;
+		}
+
+		const item = await Item.query().findById( itemId ).eager( '[owner,creator,links]' );
+
+		if ( ! item ) {
+			res.status( 400 ).send( { ok: false, error: 'Item not found' } );
+
+			return;
+		}
+
+		if ( item.creator_id !== userId ) {
+			res.status( 400 ).send( { ok: false, error: 'Can only duplicate items you created' } );
+
+			return;
+		}
+
+		const year = req.body.year || ( new Date().getFullYear() + '' );
+
+		await Item.query().insertGraph(
+			{
+				text: item.text,
+				creator_id: item.creator_id,
+				owner_id: item.owner_id,
+				visible_to_owner: item.visible_to_owner,
+				links: ( item.links || [] ).map( ( link ) => ( { url: link.url } ) ) as any,
+				year,
+			},
+		);
+
+		res.send( { ok: true } );
+	},
+
+	async removeItem( req: express.Request, res: express.Response ) {
+		const userId = await getUser( req );
+		const user = await User.query().findById( userId );
+
+		if ( ! user ) {
+			logger.error( 'no user with id ' + userId + ' found' );
+			res.clearCookie( config.cookieName, config.cookieOptions );
+			res.sendStatus( 401 );
+
+			return;
+		}
+
+		// logger.info( 'add item with %o', req.body );
+		const itemId = req.body.itemId;
+
+		if ( ! itemId ) {
+			res.status( 400 ).send( { ok: false, error: 'Item ID cannot be empty' } );
+
+			return;
+		}
+
+		const item = await Item.query().findById( itemId ).eager( '[owner,creator,links]' );
+
+		if ( ! item ) {
+			res.status( 400 ).send( { ok: false, error: 'Item not found' } );
+
+			return;
+		}
+
+		if ( item.owner_id !== userId ) {
+			res.status( 400 ).send( { ok: false, error: 'Can only remove items you own' } );
+
+			return;
+		}
+
+		// TODO: should cascade but needs testing
+		await Item.query().delete().where( 'id', '=', itemId );
+
+		res.send( { ok: true } );
+	},
 };
