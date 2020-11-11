@@ -48,6 +48,8 @@ async function main() {
 	router.get( '/api/items/', wrapApi( api.items.getAll ) );
 	router.get( '/api/items/:year', wrapApi( api.items.getAllByYear ) );
 	router.post( '/api/items', wrapApi( api.items.addItem ) );
+	router.post( '/api/items/duplicate', wrapApi( api.items.duplicateItem ) );
+	router.post( '/api/items/remove', wrapApi( api.items.removeItem ) );
 
 	router.use( '/api/comments/*', authCheck );
 	router.post( '/api/comments', wrapApi( api.comments.addComment ) );
@@ -66,4 +68,6 @@ async function main() {
 	router.listen( 3000, () => { logger.info( 'API ready on port 3000' ); } );
 }
 
-main().then( ( _ ) => { logger.info( 'Startup finished' ); } ).catch( ( err ) => { logger.error( err ); } );
+main()
+	.then( ( _ ) => { logger.info( 'Startup finished' ); } )
+	.catch( ( err ) => { logger.error( 'Startup error: ' + err ); } );

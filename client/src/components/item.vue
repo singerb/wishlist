@@ -19,6 +19,26 @@
 				</ul>
 			</div>
 		</div>
+		<div class='row' v-if='item.creator.id == currentUser.id'>
+			<div class='three columns'>
+				<button class='button add' @click='duplicating = ! duplicating'>{{ duplicating ? ' v Duplicate' : '> Duplicate' }}</button>
+			</div>
+		</div>
+		<form v-if='duplicating' v-on:submit.prevent='duplicateItem'>
+			<div class='row'>
+				<div class='six columns'>
+					<label for='yearSelect' style='display: inline-block;'>To year:</label>
+					<select v-model="targetYear" id='targetYearSelect'>
+						<option v-for="year in years" :key='year.year' :value='year.year'>
+							{{ year.year }} - {{ year.info }}
+						</option>
+					</select>
+				</div>
+				<div class='three columns'>
+					<input class='button-primary' type='submit' value='Duplicate Item'>
+				</div>
+			</div>
+		</form>
 		<div class='row' v-if='item.owner.id !== currentUser.id'>
 			<div class='three columns'>
 				<button class='button add' @click='commenting = ! commenting'>{{ commenting ? ' v Comment' : '> Comment' }}</button>
@@ -52,6 +72,21 @@
 				<small>by <wl-user :user='comment.creator'></wl-user> {{ niceDate( comment.created_at ) }}</small>
 			</div>
 		</div>
+		<div class='row' v-if='item.owner.id === currentUser.id'>
+			<div class='three columns'>
+				<button class='button add' @click='deleting = ! deleting'>{{ deleting ? ' v Remove' : '> Remove' }}</button>
+			</div>
+		</div>
+		<div class='row' v-if='deleting'>
+			<form v-on:submit.prevent='removeItem'>
+				<div class='six columns'>
+					<p class='warning'>WARNING: will remove the item, all comments, and all links associated with it</p>
+				</div>
+				<div class='three columns'>
+					<input class='button-primary' type='submit' value='Remove Item'>
+				</div>
+			</form>
+		</div>
 	</div>
 </template>
 
@@ -79,6 +114,14 @@
 	margin-top: 1rem;
 }
 
+.warning {
+	background-color: #eee;
+	color: red;
+	border-radius: 0.5em;
+	padding: 0.5em;
+	margin-bottom: 0.5em;
+}
+
 </style>
 
 
@@ -93,6 +136,7 @@ import Pill from './pill.vue';
 // store
 import appStore from '../store/app';
 import itemsStore from '../store/items';
+import yearsStore from '../store/years';
 // import usersStore from '../store/users';
 
 export default Vue.extend( {
@@ -101,12 +145,18 @@ export default Vue.extend( {
 		currentUser() {
 			return appStore.state.user;
 		},
+		years() {
+			return yearsStore.state().years;
+		},
 	},
 	data: () => {
 		return {
 			commenting: false,
+			duplicating: false,
+			deleting: false,
 			text: '',
 			claimed: false,
+			targetYear: false,
 		};
 	},
 	components: {
@@ -118,6 +168,15 @@ export default Vue.extend( {
 			await itemsStore.addComment( { text: this.text, itemId: this.item.id, claimed: this.claimed, year: this.year } );
 			this.text = '';
 			this.claimed = false;
+		},
+		async duplicateItem() {
+			await itemsStore.duplicateItem( { itemId: this.item.id, year: this.targetYear } );
+			this.targetYear = false;
+			this.duplicating = false;
+		},
+		async removeItem() {
+			await itemsStore.removeItem( { itemId: this.item.id, year: this.year } );
+			this.deleting = false;
 		},
 		niceDate,
 	},

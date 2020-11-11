@@ -9,7 +9,9 @@
 			<li>When adding items, you can add optional links to that item; new in 2018, you can add multiple links to one item. Use multiple links if you're giving people a choice, or showing some examples for a single item; keep multiple items separate.</li>
 			<li>You can comment on other people's items; new in 2018, if you're commenting to say you bought or will buy something, you can choose to claim the item when you comment, which will flag it to remind other people not to get that.</li>
 			<li>As of 2018 you can change your password and your name in the profile screen.</li>
-			<li>Finally, as of 2019 you can view previous years and their items (although due to a migration issue some 2018 data was lost).</li>
+			<li>As of 2019 you can view previous years and their items (although due to a migration issue some 2018 data was lost).</li>
+			<li>As of 2020, you can remove items that you own (i.e. items on your list).</li>
+			<li>And finally, as of 2020 you can duplicate items from previous years, along with their links but not comments (since those are usually year-specific); you can only duplicate items that you created originally.</li>
 		</ul>
 		<div v-for='user in users' :key='user.id'>
 			<wl-user-items :user='user'></wl-user-items>
